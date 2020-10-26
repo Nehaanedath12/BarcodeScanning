@@ -22,6 +22,7 @@ import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.gms.vision.barcode.BarcodeDetector;
 
 import java.io.IOException;
+import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
     ImageView barcode;
@@ -34,26 +35,28 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Objects.requireNonNull(getSupportActionBar()).hide();
         barcode=findViewById(R.id.barcode);
         surfaceView=findViewById(R.id.surfaceView);
         barcodeText=findViewById(R.id.barcodeText);
 
 
-        barcode.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CAMERA)!= PackageManager.PERMISSION_GRANTED){
-                    ActivityCompat.requestPermissions(MainActivity.this,new String[]{Manifest.permission.CAMERA},101);
-                }
-                else {
-                    if (surfaceView.getVisibility() == View.VISIBLE) {
-                        surfaceView.setVisibility(View.GONE);
-                        barcodeText.setVisibility(View.GONE);
-                    } else if (surfaceView.getVisibility() == View.GONE) {
-
-                        surfaceView.setVisibility(View.VISIBLE);
-                        barcodeScanning();
+        barcode.setOnClickListener(view -> {
+            if(ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CAMERA)!= PackageManager.PERMISSION_GRANTED){
+                ActivityCompat.requestPermissions(MainActivity.this,new String[]{Manifest.permission.CAMERA},101);
+            }
+            else {
+                if (surfaceView.getVisibility() == View.VISIBLE) {
+                    if(cameraSource!=null){
+                        cameraSource.stop();
                     }
+                    surfaceView.setVisibility(View.GONE);
+                    barcodeText.setVisibility(View.GONE);
+                } else if (surfaceView.getVisibility() == View.GONE) {
+
+                    surfaceView.setVisibility(View.VISIBLE);
+                    barcodeText.setVisibility(View.VISIBLE);
+                    barcodeScanning();
                 }
             }
         });
@@ -87,7 +90,6 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void surfaceDestroyed(@NonNull SurfaceHolder surfaceHolder) {
-
             }
         });
         barcodeDetector.setProcessor(new Detector.Processor<Barcode>() {
@@ -103,12 +105,7 @@ public class MainActivity extends AppCompatActivity {
                 final SparseArray<Barcode> array = detections.getDetectedItems();
                 if (array.size() > 0) {
 
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            barcodeText.setText(array.valueAt(0).displayValue);
-                        }
-                    });
+                    runOnUiThread(() -> barcodeText.setText(array.valueAt(0).displayValue));
             }
         }
         });
