@@ -10,6 +10,9 @@
         android:layout_width="match_parent"
         android:layout_height="?android:attr/actionBarSize"
         android:background="@color/cardview_shadow_start_color">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
         <ImageView
             android:id="@+id/barcode"
             android:layout_width="wrap_content"
@@ -17,9 +20,21 @@
             android:src="@drawable/ic_baseline_qr_code_24"/>
         <TextView
             android:id="@+id/barcodeText"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
+            android:layout_marginLeft="30dp"
+            android:layout_height="match_parent"
+            android:gravity="center" />
+
+        <Button
+            android:id="@+id/search"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="center_horizontal"/>
+            android:layout_alignParentEnd="true"
+            android:background="@color/cardview_shadow_end_color"
+            android:text=" web Search"
+            android:textColor="@color/black"
+            android:layout_alignParentRight="true" />
+        </RelativeLayout>
     </androidx.appcompat.widget.Toolbar>
     <SurfaceView
         android:id="@+id/surfaceView"

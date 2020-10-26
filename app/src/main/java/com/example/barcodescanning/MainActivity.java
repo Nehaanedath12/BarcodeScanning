@@ -5,13 +5,16 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -30,6 +33,8 @@ public class MainActivity extends AppCompatActivity {
     CameraSource cameraSource;
     BarcodeDetector barcodeDetector;
     TextView barcodeText;
+    String url;
+    Button search;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +44,8 @@ public class MainActivity extends AppCompatActivity {
         barcode=findViewById(R.id.barcode);
         surfaceView=findViewById(R.id.surfaceView);
         barcodeText=findViewById(R.id.barcodeText);
+        search=findViewById(R.id.search);
+
 
 
         barcode.setOnClickListener(view -> {
@@ -104,11 +111,26 @@ public class MainActivity extends AppCompatActivity {
 
                 final SparseArray<Barcode> array = detections.getDetectedItems();
                 if (array.size() > 0) {
-
-                    runOnUiThread(() -> barcodeText.setText(array.valueAt(0).displayValue));
+                    runOnUiThread(() -> {
+                        barcodeText.setText(array.valueAt(0).displayValue);
+                    });
             }
         }
         });
 
+        search.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                url="http://"+barcodeText.getText().toString();
+                Intent i = new Intent(Intent.ACTION_VIEW);
+                i.setData(Uri.parse(url));
+                startActivity(i);
+                surfaceView.setVisibility(View.GONE);
+                barcodeText.setVisibility(View.GONE);
+                if(cameraSource!=null){
+                    cameraSource.stop();
+                }
+            }
+        });
     }
 }
